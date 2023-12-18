@@ -3,9 +3,6 @@ export async function getCaption({ imgUrl }: { imgUrl: string }): Promise<{
 }> {
   const captioningUrl = import.meta.env.VITE_CAPTIONING_SERVER_URL;
 
-  // delay 2 seconds
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
   if (!captioningUrl || captioningUrl?.length === 0) {
     return { caption: "Lorem ipsum" };
   }
@@ -17,7 +14,7 @@ export async function getCaption({ imgUrl }: { imgUrl: string }): Promise<{
     }),
   });
 
-  const data = await response.json();
+  const caption = await response.json();
 
-  return data;
+  return { caption };
 }
