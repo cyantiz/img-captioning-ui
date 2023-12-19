@@ -26,7 +26,7 @@ const ChatMessage: FC<ChatMessageProps> = ({
       {!self && (
         <Avatar
           src="https://static.tuoitre.vn/tto/i/s626/2016/07/05/wall-e-cubecolors-1467709252.jpg"
-          size={48}
+          size={36}
         />
       )}
       {text && (

@@ -2,7 +2,7 @@ import { FC, useState } from "react";
 import {
   SendOutlined,
   LoadingOutlined,
-  InboxOutlined,
+  FileImageOutlined,
 } from "@ant-design/icons";
 import { Button, Image, message, Upload } from "antd";
 import { BeforeUploadFileType } from "rc-upload/lib/interface";
@@ -40,7 +40,7 @@ const ChatMessageInput: FC<ChatMessageInputProps> = ({ onSendMessage }) => {
         setFile(undefined);
       }}
     >
-      <div className="h-32 w-full">
+      <div className="w-full h-32">
         {file ? (
           <FilePreview
             file={file}
@@ -49,19 +49,20 @@ const ChatMessageInput: FC<ChatMessageInputProps> = ({ onSendMessage }) => {
             }}
           />
         ) : (
-          <div className="h-36">
+          <div className="h-32">
             <Upload.Dragger
               name="file"
               multiple={true}
+              accept="image/*"
               onDrop={(e) => {
                 console.log("Dropped files", e.dataTransfer.files);
               }}
               customRequest={({ file }) => customRequest({ file })}
             >
               <p className="ant-upload-drag-icon">
-                <InboxOutlined />
+                <FileImageOutlined className="!text-[32px]" />
               </p>
-              <p className="ant-upload-text">
+              <p className="ant-upload-text !text-sm">
                 Click or drag image to this area
               </p>
             </Upload.Dragger>

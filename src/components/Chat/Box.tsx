@@ -2,21 +2,23 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import ChatMessage from "./Message";
 import { Avatar, Divider, Spin } from "antd";
 import ChatMessageInput from "./MessageInput";
-import { IMessage } from "../../types";
+import { IMessage, Model } from "../../types";
 import { message } from "antd";
 
 import { sendFileToStorage } from "../../utils/firebase.util";
-import { getCaption } from "../../utils/captioning.util";
+import { getCaptionFromBLIP, getCaptionFromVisionEncoder } from "../../api";
 import {
   addMessagesToConversation,
   getConversationFromLocalStorage,
 } from "../../utils/localStorage.util";
+import ModelSelect from "../ModelSelect";
 export type ChatBoxProps = {
   // Define your props here if needed
 };
 
 const ChatBox: FC<ChatBoxProps> = ({}) => {
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [model, setModel] = useState<Model>("blip");
   const [showBlind, setShowBlind] = useState(true);
 
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,16 @@ const ChatBox: FC<ChatBoxProps> = ({}) => {
     setMessages((messages) => [...messages, newMessage]);
     messageListRef.current && messageListRef.current.scrollTo(0, 9999999);
 
-    const caption = (await getCaption({ imgUrl })).caption;
+    const caption = (
+      await (async () => {
+        if (model === "blip") {
+          return await getCaptionFromBLIP({ imgUrl });
+        } else {
+          return await getCaptionFromVisionEncoder({ imgUrl });
+        }
+      })()
+    ).caption;
+
     const newResponse: IMessage = {
       text: `Content in your image is: ${caption}`,
       self: false,
@@ -64,23 +75,26 @@ const ChatBox: FC<ChatBoxProps> = ({}) => {
 
     setTimeout(() => {
       setShowBlind(false);
-    }, 1000);
+    }, 100);
   }, []);
 
   return (
     <div className="flex h-full w-full flex-col justify-between relative">
-      <div v-if="chatUserInfo" className="flex items-center gap-4">
-        <div className="rounded-full border-solid border-blue-400 border-2">
-          <Avatar
-            src="https://static.tuoitre.vn/tto/i/s626/2016/07/05/wall-e-cubecolors-1467709252.jpg"
-            size={72}
-          />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="rounded-full w-fit border-solid border-blue-400 border-2">
+            <Avatar
+              src="https://static.tuoitre.vn/tto/i/s626/2016/07/05/wall-e-cubecolors-1467709252.jpg"
+              size={36}
+            />
+          </div>
+          <div className="flex-1 pb-1">
+            <p className="overflow-hidden text-ellipsis whitespace-nowrap text-md font-bold">
+              Image Captioning
+            </p>
+          </div>
         </div>
-        <div className="flex-1 pb-1">
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-lg font-bold">
-            Image Captioning
-          </p>
-        </div>
+        <ModelSelect value={model} onChange={(e) => setModel(e)} />
       </div>
       <Divider className="my-4" />
       {showBlind && (
