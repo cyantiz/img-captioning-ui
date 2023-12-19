@@ -12,6 +12,7 @@ import {
   getConversationFromLocalStorage,
 } from "../../utils/localStorage.util";
 import ModelSelect from "../ModelSelect";
+import { capFirst } from "../../utils/string";
 export type ChatBoxProps = {
   // Define your props here if needed
 };
@@ -50,15 +51,15 @@ const ChatBox: FC<ChatBoxProps> = ({}) => {
     const caption = (
       await (async () => {
         if (model === "blip") {
-          return await getCaptionFromBLIP({ imgUrl });
+          return await getCaptionFromBLIP({ file });
         } else {
-          return await getCaptionFromVisionEncoder({ imgUrl });
+          return await getCaptionFromVisionEncoder({ file });
         }
       })()
     ).caption;
 
     const newResponse: IMessage = {
-      text: `Content in your image is: ${caption}`,
+      text: caption ? capFirst(caption) : "No caption found",
       self: false,
       createdAt: Date.now() + 1,
     };
